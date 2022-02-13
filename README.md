@@ -10,3 +10,9 @@ transaction and exchange processing service
 data generation
 configuration
 
+
+# scripts
+
+docker pull postgres:9.6.24-bullseye
+
+docker run --publish 127.0.0.1:5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -d postgres

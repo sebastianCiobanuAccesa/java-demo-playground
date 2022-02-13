@@ -1,0 +1,43 @@
+Python vs Java
+
+
+1 Data integration layer (stratch goal)
+- M-N relationship modeling (lazy loading + N+1 problem) 
+(have two types of "Person" and a list of "currency's" associated with the person) 
+   students - subjects with fields. List of students without subjects
+   iterate flow (n + 1) how to mitigate? Hibernate + Spring Data?
+   
+   lazy loading + N + 1. 
+   PrivatePersons + Agencies (Broker, bank) -> childs of Person
+   Wallet -> coins 
+   Private Persons -> one to may wallets
+   Agencies -> one to many Wallets
+   
+
+2: In mem caching (have flow with and without caching)  / size?
+ - self configured / framework caching
+ 
+3: Business logic layer
+- Have logic to transform said "wallet" (list of currencies) to one uniform currency based on param. Ex.: 5 eur + 10 USD = X RON
+Controller layer
+- random fluctuation -> x => calculate to universal result: once a second each coin pair fluctuates with 10%
+- CRUD on person + walet and without vallet. (Projection)
+
+- data generation: dynamic random data generator (first name last name) 10 000 - 100 000 person each with 1-10 currencies
+- Endpoint to fetch all money a person has tranformed to a specified curency.
+- Prediction on currency swap (what makes more sense for a given person/agency)
+
+
+
+General aspects:
+- All steps/methods should be timed
+- Posibility of external configuration (Deployment env config, secrets etc...)
+- Main aspects up for debate:
+Lack or abundance of boilerplate
+Performance
+Readability
+Extendability
+Language/framework ways of guarding against developer errors
+Development speed (Initial setup, configuration, Compile times locally)
+Dependency management (Versioning, transitive debendencies, etc...)
+Ease of troubleshooting
