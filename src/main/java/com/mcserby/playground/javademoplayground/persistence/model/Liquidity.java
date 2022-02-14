@@ -5,25 +5,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
 @Data
-@Entity
-@Table(name = "currency")
+@Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Currency {
+public class Liquidity {
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private long id;
+    @Column
+    private Double value;
 
     @Column
     private String name;
 
     @Column
     private String ticker;
-
-
 }

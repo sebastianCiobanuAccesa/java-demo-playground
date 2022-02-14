@@ -1,0 +1,47 @@
+{
+  "name" : "SerbyBank",
+  "wallets" : [ {
+    "name" : "wallet1",
+    "liquidityList" : [ {
+      "value" : 100.0,
+      "name" : "Leu",
+      "ticker" : "RON"
+    }, {
+      "value" : 4000.0,
+      "name" : "Bitcoin",
+      "ticker" : "BTC"
+    }, {
+      "value" : 400000.0,
+      "name" : "Euro",
+      "ticker" : "EUR"
+    }, {
+      "value" : 500.0,
+      "name" : "Dollar",
+      "ticker" : "USD"
+    } ]
+  } ],
+  "cui" : "Cluj2198082820",
+  "exchangePools" : [ {
+    "liquidityOne" : {
+      "value" : 100000.0,
+      "name" : "Euro",
+      "ticker" : "EUR"
+    },
+    "liquidityTwo" : {
+      "value" : 100000.0,
+      "name" : "Dollar",
+      "ticker" : "USD"
+    }
+  }, {
+    "liquidityOne" : {
+      "value" : 100000.0,
+      "name" : "Dollar",
+      "ticker" : "USD"
+    },
+    "liquidityTwo" : {
+      "value" : 1000.0,
+      "name" : "Bitcoin",
+      "ticker" : "BTC"
+    }
+  } ]
+}

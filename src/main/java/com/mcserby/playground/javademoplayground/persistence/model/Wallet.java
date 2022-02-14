@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Map;
+import java.util.List;
 
 @Data
 @Entity
@@ -18,12 +18,12 @@ public class Wallet {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @Column
     private String name;
 
     @ElementCollection
-    private Map<Currency, Double> currencies;
+    private List<Liquidity> liquidityList;
 
 }
