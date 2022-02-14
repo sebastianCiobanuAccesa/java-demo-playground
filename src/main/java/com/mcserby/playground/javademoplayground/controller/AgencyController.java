@@ -2,7 +2,9 @@ package com.mcserby.playground.javademoplayground.controller;
 
 import com.mcserby.playground.javademoplayground.dto.Agency;
 import com.mcserby.playground.javademoplayground.mapper.DtoToEntityMapper;
+import com.mcserby.playground.javademoplayground.monitoring.TrackExecutionTime;
 import com.mcserby.playground.javademoplayground.persistence.repository.AgencyRepository;
+import com.mcserby.playground.javademoplayground.persistence.repository.ExchangePoolRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,12 +15,15 @@ import java.util.stream.StreamSupport;
 public class AgencyController {
 
     private final AgencyRepository repository;
+    private final ExchangePoolRepository exchangePoolRepository;
 
-    AgencyController(AgencyRepository repository) {
+    AgencyController(AgencyRepository repository, ExchangePoolRepository exchangePoolRepository) {
         this.repository = repository;
+        this.exchangePoolRepository = exchangePoolRepository;
     }
 
     @GetMapping("/agencies")
+    @TrackExecutionTime
     List<Agency> all() {
         return StreamSupport.stream(repository.findAll().spliterator(), false)
                 .map(DtoToEntityMapper::map)
@@ -26,24 +31,30 @@ public class AgencyController {
     }
 
     @PostMapping("/agency")
+    @TrackExecutionTime
     Agency newAgency(@RequestBody Agency agency) {
         return DtoToEntityMapper.map(repository.save(DtoToEntityMapper.map(agency)));
     }
 
     @GetMapping("/agency/{id}")
+    @TrackExecutionTime
     Agency getOne(@PathVariable Long id) {
         return repository.findById(id).map(DtoToEntityMapper::map)
                 .orElseThrow(() -> new RuntimeException("not found"));
     }
 
     @PutMapping("/agency")
+    @TrackExecutionTime
     Agency replace(@RequestBody Agency agency) {
         return DtoToEntityMapper.map(repository.save(DtoToEntityMapper.map(agency)));
 
     }
 
     @DeleteMapping("/agencies/{id}")
+    @TrackExecutionTime
     void delete(@PathVariable Long id) {
+        repository.findById(id).ifPresent(
+                a -> a.getExchangePools().forEach(ep -> exchangePoolRepository.deleteById(ep.getId())));
         repository.deleteById(id);
     }
 }
