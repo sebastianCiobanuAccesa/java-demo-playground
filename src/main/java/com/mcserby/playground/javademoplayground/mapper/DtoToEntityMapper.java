@@ -76,7 +76,7 @@ public class DtoToEntityMapper {
                 .build();
     }
 
-    private static com.mcserby.playground.javademoplayground.dto.Liquidity map(Liquidity liquidity) {
+    public static com.mcserby.playground.javademoplayground.dto.Liquidity map(Liquidity liquidity) {
         return com.mcserby.playground.javademoplayground.dto.Liquidity.builder()
                 .name(liquidity.getName())
                 .ticker(liquidity.getTicker())

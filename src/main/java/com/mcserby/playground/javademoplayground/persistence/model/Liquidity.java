@@ -23,4 +23,5 @@ public class Liquidity {
 
     @Column
     private String ticker;
+
 }
