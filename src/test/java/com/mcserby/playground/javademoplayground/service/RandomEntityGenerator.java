@@ -35,15 +35,11 @@ public class RandomEntityGenerator {
                 .build();
     }
 
-    public static Agency generateRandomAgency(int maxWalletsPerAgency, int maxExchangePools, double maxLiquidityValue, Random random) {
-        List<Wallet> wallets = IntStream.range(0, random.nextInt(maxWalletsPerAgency) + 1)
-                .mapToObj(i -> generateRandomWallet(maxLiquidityValue, random))
-                .collect(Collectors.toList());
+    public static Agency generateRandomAgency(int maxExchangePools, double maxLiquidityValue, Random random) {
         List<ExchangePool> exchangePools = IntStream.range(0, random.nextInt(maxExchangePools)).mapToObj(
                 i -> generateRandomExchangePool(maxLiquidityValue, random)).collect(Collectors.toList());
         Agency agency = Agency.builder()
                 .name(generateRandomString(20, random))
-                .wallets(wallets)
                 .cui(generateRandomString(50, random))
                 .exchangePools(exchangePools)
                 .build();
@@ -56,13 +52,13 @@ public class RandomEntityGenerator {
         Collections.shuffle(keys);
         Liquidity firstCurrency = Liquidity.builder()
                 .value(random.nextDouble() * maxLiquidityValue)
-                .name(keys.get(0))
-                .ticker(CURRENCIES.get(keys.get(0)))
+                .ticker(keys.get(0))
+                .name(CURRENCIES.get(keys.get(0)))
                 .build();
         Liquidity secondCurrency = Liquidity.builder()
                 .value(random.nextDouble() * maxLiquidityValue)
-                .name(keys.get(1))
-                .ticker(CURRENCIES.get(keys.get(1)))
+                .ticker(keys.get(1))
+                .name(CURRENCIES.get(keys.get(1)))
                 .build();
 
         return ExchangePool.builder()

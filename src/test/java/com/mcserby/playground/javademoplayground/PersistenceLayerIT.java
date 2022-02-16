@@ -3,16 +3,13 @@ package com.mcserby.playground.javademoplayground;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mcserby.playground.javademoplayground.mapper.DtoToEntityMapper;
-import com.mcserby.playground.javademoplayground.monitoring.TrackExecutionTime;
 import com.mcserby.playground.javademoplayground.persistence.model.*;
 import com.mcserby.playground.javademoplayground.persistence.repository.AgencyRepository;
 import com.mcserby.playground.javademoplayground.persistence.repository.ExchangePoolRepository;
 import com.mcserby.playground.javademoplayground.persistence.repository.PersonRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.jdbc.JdbcTestUtils;
@@ -25,7 +22,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @TestPropertySource("classpath:application-test.properties")
@@ -153,15 +151,6 @@ public class PersistenceLayerIT {
     }
 
     private Agency createTestAgency(){
-        Wallet wallet = Wallet.builder()
-                .name("wallet1")
-                .liquidityList(List.of(
-                        Liquidity.builder().value(100.0).name("Leu").ticker("RON").build(),
-                        Liquidity.builder().value(4000.0).name("Bitcoin").ticker("BTC").build(),
-                        Liquidity.builder().value(400000.0).name("Euro").ticker("EUR").build(),
-                        Liquidity.builder().value(500.0).name("Dollar").ticker("USD").build()))
-                .build();
-        List<Wallet> wallets = List.of(wallet);
         List<ExchangePool> exchangePools = new ArrayList<>();
         ExchangePool eurUsd = ExchangePool.builder()
                 .liquidityOne(Liquidity.builder().name("Euro").ticker("EUR").value(100_000.0).build())
@@ -175,7 +164,6 @@ public class PersistenceLayerIT {
         exchangePools.add(usdBtc);
         Agency agency = Agency.builder()
                 .name("SerbyBank")
-                .wallets(wallets)
                 .cui("Cluj2198082820")
                 .exchangePools(exchangePools)
                 .build();

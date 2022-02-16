@@ -2,10 +2,10 @@ package com.mcserby.playground.javademoplayground.service;
 
 import com.mcserby.playground.javademoplayground.dto.Currency;
 import com.mcserby.playground.javademoplayground.dto.ExchangeRequest;
-import com.mcserby.playground.javademoplayground.mapper.DtoToEntityMapper;
 import com.mcserby.playground.javademoplayground.persistence.model.*;
 import com.mcserby.playground.javademoplayground.persistence.repository.AgencyRepository;
 import com.mcserby.playground.javademoplayground.persistence.repository.PersonRepository;
+import com.mcserby.playground.javademoplayground.persistence.repository.WalletRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -31,6 +31,7 @@ public class SwapSimulator {
     private final Dex dex;
     private final PersonRepository personRepository;
     private final AgencyRepository agencyRepository;
+    private final WalletRepository walletRepository;
 
     private final ScheduledExecutorService executor;
 
@@ -38,10 +39,11 @@ public class SwapSimulator {
 
     public SwapSimulator(Dex dex,
                          PersonRepository personRepository,
-                         AgencyRepository agencyRepository) {
+                         AgencyRepository agencyRepository, WalletRepository walletRepository) {
         this.dex = dex;
         this.personRepository = personRepository;
         this.agencyRepository = agencyRepository;
+        this.walletRepository = walletRepository;
         this.executor = Executors.newSingleThreadScheduledExecutor();
     }
 
@@ -51,22 +53,23 @@ public class SwapSimulator {
     }
 
     public void startSwap(int swapFrequency) {
-        logger.info("starting swap simulator...");
         stopSwap();
+        logger.info("starting swap simulator...");
         scheduledFuture = executor.scheduleAtFixedRate(this::simulateSwapTask, 0, swapFrequency, TimeUnit.MILLISECONDS);
     }
 
     public void stopSwap() {
-        logger.info("stopping swap simulator...");
         if (scheduledFuture != null && !scheduledFuture.isCancelled()) {
+            logger.info("stopping swap simulator...");
             scheduledFuture.cancel(true);
         }
     }
 
     private void simulateSwapTask() {
+        logger.info("simulate swap task");
         Random random = new Random();
         Person p = getRandomPerson();
-        if(p.getWallets().isEmpty()){
+        if (p.getWallets().isEmpty()) {
             logger.info("person " + p.getName() + " does not have any wallet. Cannot simulate swap.");
             return;
         }
@@ -117,13 +120,13 @@ public class SwapSimulator {
         int idx = (int) (Math.random() * qty);
         Page<Agency> questionPage = agencyRepository.findAll(PageRequest.of(idx, 1));
         if (!questionPage.hasContent()) {
-            throw new RuntimeException("could not fetch random person from DB");
+            throw new RuntimeException("could not fetch random agency");
         }
-        return questionPage.getContent().get(0);
-    }
-
-    private Wallet getRandomWallet(Random random, List<Wallet> wallets) {
-        return wallets.get(random.nextInt(wallets.size()));
+        List<Agency> byIdWithExchangePools = agencyRepository.findByIdWithExchangePools(questionPage.getContent().get(0).getId());
+        if(byIdWithExchangePools.isEmpty()){
+            throw new RuntimeException("could not fetch agency");
+        }
+        return byIdWithExchangePools.get(0);
     }
 
     private Person getRandomPerson() {
@@ -131,8 +134,15 @@ public class SwapSimulator {
         int idx = (int) (Math.random() * qty);
         Page<Person> questionPage = personRepository.findAll(PageRequest.of(idx, 1));
         if (!questionPage.hasContent()) {
-            throw new RuntimeException("could not fetch random person from DB");
+            throw new RuntimeException("could not fetch random person");
         }
-        return questionPage.getContent().get(0);
+        Person person = questionPage.getContent().get(0);
+        List<Wallet> wallets = walletRepository.findWalletsByPersonId(person.getId());
+        person.setWallets(wallets);
+        return person;
+    }
+
+    private Wallet getRandomWallet(Random random, List<Wallet> wallets) {
+        return wallets.get(random.nextInt(wallets.size()));
     }
 }

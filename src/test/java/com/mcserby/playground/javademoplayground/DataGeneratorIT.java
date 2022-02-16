@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @SpringBootTest
 @TestPropertySource("classpath:application.properties")
@@ -52,7 +49,7 @@ public class DataGeneratorIT {
     void generateRandomAgencies(Random random) {
         for (int i = 0; i < NUMBER_OF_RANDOM_AGENCIES; i++) {
             Agency agency = RandomEntityGenerator
-                    .generateRandomAgency(MAX_WALLETS_PER_AGENCY, MAX_EXCHANGE_POOLS, MAX_LIQUIDITY_VALUE, random);
+                    .generateRandomAgency(MAX_EXCHANGE_POOLS, MAX_LIQUIDITY_VALUE, random);
             logger.info("agency: " + agency.getName());
             agencyRepository.save(agency);
         }

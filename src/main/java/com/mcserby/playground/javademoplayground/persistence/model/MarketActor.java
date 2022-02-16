@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @MappedSuperclass
-public class MarketActor {
+public abstract class MarketActor {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -21,6 +21,7 @@ public class MarketActor {
     @Column
     private String name;
 
-    @OneToMany(cascade=CascadeType.ALL)
-    private List<Wallet> wallets;
+
+
+
 }

@@ -12,7 +12,6 @@ public class DtoToEntityMapper {
                 .name(agency.getName())
                 .cui(agency.getCui())
                 .exchangePools(agency.getExchangePools().stream().map(DtoToEntityMapper::map).collect(Collectors.toList()))
-                .wallets(agency.getWallets().stream().map(DtoToEntityMapper::map).collect(Collectors.toList()))
                 .build();
     }
 
@@ -22,7 +21,6 @@ public class DtoToEntityMapper {
                 .name(agency.getName())
                 .cui(agency.getCui())
                 .exchangePools(agency.getExchangePools().stream().map(DtoToEntityMapper::map).collect(Collectors.toList()))
-                .wallets(agency.getWallets().stream().map(DtoToEntityMapper::map).collect(Collectors.toList()))
                 .build();
         result.setExchangePoolReferences();
         return result;

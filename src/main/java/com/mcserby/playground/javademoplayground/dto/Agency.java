@@ -14,8 +14,6 @@ public class Agency {
 
     private String name;
 
-    private List<Wallet> wallets;
-
     private String cui;
 
     private List<ExchangePool> exchangePools;

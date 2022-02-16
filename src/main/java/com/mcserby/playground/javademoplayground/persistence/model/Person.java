@@ -6,10 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 @Data
@@ -26,5 +23,8 @@ public class Person extends MarketActor {
     @Lob
     @Column(name = "photo")
     private byte[] photo;
+
+    @OneToMany(mappedBy = "person", cascade=CascadeType.ALL)
+    private List<Wallet> wallets;
 
 }
