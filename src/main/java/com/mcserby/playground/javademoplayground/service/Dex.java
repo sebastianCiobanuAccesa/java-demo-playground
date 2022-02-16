@@ -67,24 +67,26 @@ public class Dex implements PriceSource {
             Wallet wallet = walletRepository.findById(request.getWalletId())
                     .orElseThrow(() -> new RuntimeException("Wallet not found"));
 
-            Double exchangedValue = request.getFrom().getValue();
+            Double exchangedValue = request.getValue();
             // validate liquidity
             List<Liquidity> userLiquidities = new ArrayList<>(wallet.getLiquidityList());
             if (userLiquidities.stream().noneMatch(
-                    l -> l.getTicker().equals(request.getFrom().getTicker())
+                    l -> l.getTicker().equals(request.getFrom())
                             && l.getValue() > exchangedValue)) {
-                throw new RuntimeException("Insufficient funds");
+                return ExchangeResult.builder().message("Could not perform swap due to Insufficient funds.")
+                        .successful(false)
+                        .build();
             }
 
             ExchangePool exchangePool = searchEligibleLP(request, agency);
 
             Liquidity liquidityFrom =
-                    userLiquidities.stream().filter(l -> l.getTicker().equals(request.getFrom().getTicker())).findFirst()
+                    userLiquidities.stream().filter(l -> l.getTicker().equals(request.getFrom())).findFirst()
                             .get();
             Liquidity liquidityTo =
-                    userLiquidities.stream().filter(l -> l.getTicker().equals(request.getTo().getTicker())).findFirst().orElse(
-                            Liquidity.builder().ticker(request.getTo().getTicker()).value(0.0).build());
-            if (userLiquidities.stream().noneMatch(l -> l.getTicker().equals(request.getTo().getTicker()))){
+                    userLiquidities.stream().filter(l -> l.getTicker().equals(request.getTo())).findFirst().orElse(
+                            Liquidity.builder().ticker(request.getTo()).value(0.0).build());
+            if (userLiquidities.stream().noneMatch(l -> l.getTicker().equals(request.getTo()))){
                 userLiquidities.add(liquidityTo);
             }
 
@@ -96,7 +98,7 @@ public class Dex implements PriceSource {
             double returnedValue = 0;
             double exchangePoolNewPrice = 0;
 
-            if (request.getFrom().getTicker().equals(exchangePool.getLiquidityOne().getTicker())) {
+            if (request.getFrom().equals(exchangePool.getLiquidityOne().getTicker())) {
                 returnedValue = y - k / (x + delta);
                 double newX = x + delta;
                 double newY = y - returnedValue;
@@ -164,13 +166,13 @@ public class Dex implements PriceSource {
 
     private ExchangePool searchEligibleLP(ExchangeRequest request, Agency agency) {
         return agency.getExchangePools().stream()
-                .filter(ep -> (ep.getLiquidityOne().getTicker().equals(request.getFrom().getTicker())
-                        && ep.getLiquidityTwo().getTicker().equals(request.getTo().getTicker()))
-                        || (ep.getLiquidityTwo().getTicker().equals(request.getFrom().getTicker())
-                        && ep.getLiquidityOne().getTicker().equals(request.getTo().getTicker()))).findFirst()
+                .filter(ep -> (ep.getLiquidityOne().getTicker().equals(request.getFrom())
+                        && ep.getLiquidityTwo().getTicker().equals(request.getTo()))
+                        || (ep.getLiquidityTwo().getTicker().equals(request.getFrom())
+                        && ep.getLiquidityOne().getTicker().equals(request.getTo()))).findFirst()
                 .orElseThrow(() -> new RuntimeException(
-                        "Liquidity pool not found for this token pair: " + request.getFrom().getTicker() + "/" +
-                                request.getTo().getTicker()));
+                        "Liquidity pool not found for this token pair: " + request.getFrom() + "/" +
+                                request.getTo()));
     }
 
 

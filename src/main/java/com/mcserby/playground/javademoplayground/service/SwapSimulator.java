@@ -1,6 +1,5 @@
 package com.mcserby.playground.javademoplayground.service;
 
-import com.mcserby.playground.javademoplayground.dto.Currency;
 import com.mcserby.playground.javademoplayground.dto.ExchangeRequest;
 import com.mcserby.playground.javademoplayground.persistence.model.*;
 import com.mcserby.playground.javademoplayground.persistence.repository.AgencyRepository;
@@ -94,8 +93,8 @@ public class SwapSimulator {
                 .personId(p.getId())
                 .walletId(w.getId())
                 .agencyId(a.getId())
-                .from(exchangedLiquidity)
-                .to(Currency.builder().ticker(maybeTo.get()).build())
+                .from(exchangedLiquidity.getTicker())
+                .to(maybeTo.get())
                 .build();
         this.dex.swap(request);
     }

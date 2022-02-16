@@ -43,8 +43,9 @@ class DexTest {
                 .agencyId(1)
                 .personId(1)
                 .walletId(1)
-                .from(Liquidity.builder().name("Dollar").ticker("USD").value(100.0).build())
-                .to(Currency.builder().ticker("BTC").build())
+                .value(100.0)
+                .from("USD")
+                .to("BTC")
                 .build();
 
         ExchangePool usdBtc = ExchangePool.builder()
@@ -84,8 +85,9 @@ class DexTest {
                 .agencyId(1)
                 .personId(1)
                 .walletId(1)
-                .from(Liquidity.builder().name("Dollar").ticker("USD").value(100.0).build())
-                .to(Currency.builder().ticker("BTC").build())
+                .from("USD")
+                .to("BTC")
+                .value(100.0)
                 .build();
 
         ExchangePool usdBtc = ExchangePool.builder()
@@ -125,8 +127,9 @@ class DexTest {
                 .agencyId(1)
                 .personId(1)
                 .walletId(1)
-                .from(Liquidity.builder().name("Dollar").ticker("USD").value(5000.0).build())
-                .to(Currency.builder().ticker("BTC").build())
+                .from("USD")
+                .to("BTC")
+                .value(5000.0)
                 .build();
 
         ExchangePool usdBtc = ExchangePool.builder()

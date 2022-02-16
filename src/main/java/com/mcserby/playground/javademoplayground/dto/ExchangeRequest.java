@@ -10,7 +10,8 @@ public class ExchangeRequest {
     private long personId;
     private long walletId;
     private long agencyId;
-    private Liquidity from;
-    private Currency to;
+    private String from;
+    private String to;
+    private Double value;
 
 }
