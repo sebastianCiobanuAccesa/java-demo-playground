@@ -1,4 +1,4 @@
-package com.mcserby.playground.javademoplayground;
+package com.mcserby.playground.javademoplayground.integration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

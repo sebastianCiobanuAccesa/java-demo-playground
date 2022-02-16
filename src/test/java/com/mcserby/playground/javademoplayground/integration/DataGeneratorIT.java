@@ -1,4 +1,4 @@
-package com.mcserby.playground.javademoplayground;
+package com.mcserby.playground.javademoplayground.integration;
 
 
 import com.mcserby.playground.javademoplayground.persistence.model.*;

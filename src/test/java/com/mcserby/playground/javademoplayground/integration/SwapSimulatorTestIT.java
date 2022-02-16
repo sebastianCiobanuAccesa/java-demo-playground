@@ -1,4 +1,4 @@
-package com.mcserby.playground.javademoplayground.service;
+package com.mcserby.playground.javademoplayground.integration;
 
 import com.mcserby.playground.javademoplayground.persistence.model.Agency;
 import com.mcserby.playground.javademoplayground.persistence.model.Liquidity;
@@ -7,6 +7,8 @@ import com.mcserby.playground.javademoplayground.persistence.model.Wallet;
 import com.mcserby.playground.javademoplayground.persistence.repository.AgencyRepository;
 import com.mcserby.playground.javademoplayground.persistence.repository.PersonRepository;
 import com.mcserby.playground.javademoplayground.persistence.repository.WalletRepository;
+import com.mcserby.playground.javademoplayground.service.RandomEntityGenerator;
+import com.mcserby.playground.javademoplayground.service.SwapSimulator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
