@@ -1,4 +1,4 @@
-# java-temo-playground
+# java-demo-playground
 a java spring demo playground for Java vs Python debate session
 
 generated using https://start.spring.io/
@@ -9,7 +9,6 @@ Postgresql (Spring data + Jpa2 storage)
 transaction and exchange processing service
 data generation
 configuration
-
 
 # scripts
 

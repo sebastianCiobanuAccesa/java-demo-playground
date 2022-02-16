@@ -11,16 +11,14 @@ public class RandomEntityGenerator {
 
     private final static Map<String, String> CURRENCIES;
     static {
-        CURRENCIES = Map.of("EUR", "Euro",
+        CURRENCIES = Map.of(
+                "EUR", "Euro",
                 "USD", "Dollar",
-                "RON", "leu",
                 "BTC", "Bitcoin",
                 "ETH", "Ethereum",
                 "DOGE", "Dogecoin",
-                "EGLD", "eGold",
-                "SOL", "Solana",
-                "MATIC", "Polygon",
-                "ATOM", "Cosmos");
+                "EGLD", "eGold"
+        );
     }
 
     public static Person generateRandomPerson(int maxWalletsPerPerson, double maxLiquidityValue, Random random) {

@@ -5,6 +5,8 @@ import com.mcserby.playground.javademoplayground.mapper.DtoToEntityMapper;
 import com.mcserby.playground.javademoplayground.monitoring.TrackExecutionTime;
 import com.mcserby.playground.javademoplayground.persistence.repository.AgencyRepository;
 import com.mcserby.playground.javademoplayground.persistence.repository.ExchangePoolRepository;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,12 +34,14 @@ public class AgencyController {
 
     @PostMapping("/agency")
     @TrackExecutionTime
+    @CachePut("agency")
     Agency newAgency(@RequestBody Agency agency) {
         return DtoToEntityMapper.map(repository.save(DtoToEntityMapper.map(agency)));
     }
 
     @GetMapping("/agency/{id}")
     @TrackExecutionTime
+    @Cacheable("agency")
     Agency getOne(@PathVariable Long id) {
         return repository.findById(id).map(DtoToEntityMapper::map)
                 .orElseThrow(() -> new RuntimeException("not found"));
@@ -45,6 +49,7 @@ public class AgencyController {
 
     @PutMapping("/agency")
     @TrackExecutionTime
+    @CachePut("agency")
     Agency replace(@RequestBody Agency agency) {
         return DtoToEntityMapper.map(repository.save(DtoToEntityMapper.map(agency)));
 
@@ -56,5 +61,12 @@ public class AgencyController {
         repository.findById(id).ifPresent(
                 a -> a.getExchangePools().forEach(ep -> exchangePoolRepository.deleteById(ep.getId())));
         repository.deleteById(id);
+    }
+
+    @DeleteMapping("/agencies")
+    @TrackExecutionTime
+    void deleteAll() {
+        exchangePoolRepository.deleteAll();
+        repository.deleteAll();
     }
 }

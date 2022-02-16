@@ -1,0 +1,32 @@
+{
+  "name": "Anonymous",
+  "address": "WWW",
+  "photo": "YXNsamZkYXNvaWRmamFzb2pmYXNsZGZqYXNkZmpwYXNvamZkYXNsamZkb2FzZGpmb2FzamZvYXNkamRmb2FzZGZhcyA=",
+  "wallets": [
+    {
+      "name": "unlisted",
+      "liquidityList": [
+        {
+          "value": 20000,
+          "name": "Dollar",
+          "ticker": "USD"
+        },
+        {
+          "value": 100000,
+          "name": "Euro",
+          "ticker": "EUR"
+        },
+        {
+          "value": 500,
+          "name": "eGold",
+          "ticker": "EGLD"
+        },
+        {
+          "value": 150,
+          "name": "Bitcoin",
+          "ticker": "BTC"
+        }
+      ]
+    }
+  ]
+}

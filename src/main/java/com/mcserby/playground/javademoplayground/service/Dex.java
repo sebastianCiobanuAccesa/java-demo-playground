@@ -2,7 +2,11 @@ package com.mcserby.playground.javademoplayground.service;
 
 import com.mcserby.playground.javademoplayground.dto.ExchangeRequest;
 import com.mcserby.playground.javademoplayground.dto.ExchangeResult;
-import com.mcserby.playground.javademoplayground.persistence.model.*;
+import com.mcserby.playground.javademoplayground.model.PriceChangedEvent;
+import com.mcserby.playground.javademoplayground.persistence.model.Agency;
+import com.mcserby.playground.javademoplayground.persistence.model.ExchangePool;
+import com.mcserby.playground.javademoplayground.persistence.model.Liquidity;
+import com.mcserby.playground.javademoplayground.persistence.model.Wallet;
 import com.mcserby.playground.javademoplayground.persistence.repository.AgencyRepository;
 import com.mcserby.playground.javademoplayground.persistence.repository.ExchangePoolRepository;
 import com.mcserby.playground.javademoplayground.persistence.repository.PersonRepository;
@@ -13,11 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @Service
-public class Dex {
+public class Dex implements PriceSource {
 
     private final Logger logger = LoggerFactory.getLogger(Dex.class);
 
@@ -25,6 +30,8 @@ public class Dex {
     private final PersonRepository personRepository;
     private final WalletRepository walletRepository;
     private final ExchangePoolRepository exchangePoolRepository;
+
+    private final Map<String, PriceChangesSubscriber> subscribers;
 
     public Dex(AgencyRepository agencyRepository,
                PersonRepository personRepository,
@@ -34,12 +41,23 @@ public class Dex {
         this.personRepository = personRepository;
         this.walletRepository = walletRepository;
         this.exchangePoolRepository = exchangePoolRepository;
+
+        subscribers = new HashMap<>();
+    }
+
+    @Override
+    public void subscribeForPriceChanges(PriceChangesSubscriber subscriber) {
+        subscribers.put(subscriber.identifier(), subscriber);
+    }
+
+    @Override
+    public void unSubscribeForPriceChanges(PriceChangesSubscriber subscriber) {
+        subscribers.remove(subscriber.identifier());
     }
 
     @Transactional
     public ExchangeResult swap(ExchangeRequest request) {
         try {
-            logger.info("swap request: " + request);
             Agency agency = this.agencyRepository.findById(request.getAgencyId())
                     .orElseThrow(() -> new RuntimeException("Agency not found"));
 
@@ -58,15 +76,7 @@ public class Dex {
                 throw new RuntimeException("Insufficient funds");
             }
 
-
-            ExchangePool exchangePool = agency.getExchangePools().stream()
-                    .filter(ep -> (ep.getLiquidityOne().getTicker().equals(request.getFrom().getTicker())
-                            && ep.getLiquidityTwo().getTicker().equals(request.getTo().getTicker()))
-                            || (ep.getLiquidityTwo().getTicker().equals(request.getFrom().getTicker())
-                            && ep.getLiquidityOne().getTicker().equals(request.getTo().getTicker()))).findFirst()
-                    .orElseThrow(() -> new RuntimeException(
-                            "Liquidity pool not found for this token pair: " + request.getFrom().getTicker() + "/" +
-                                    request.getTo().getTicker()));
+            ExchangePool exchangePool = searchEligibleLP(request, agency);
 
             Liquidity liquidityFrom =
                     userLiquidities.stream().filter(l -> l.getTicker().equals(request.getFrom().getTicker())).findFirst()
@@ -74,7 +84,6 @@ public class Dex {
             Liquidity liquidityTo =
                     userLiquidities.stream().filter(l -> l.getTicker().equals(request.getTo().getTicker())).findFirst().orElse(
                             Liquidity.builder().ticker(request.getTo().getTicker()).value(0.0).build());
-            logger.info("initial balances for wallet " + wallet.getId() +  ":\nfrom: " + liquidityFrom + "\nto:" + liquidityTo);
             if (userLiquidities.stream().noneMatch(l -> l.getTicker().equals(request.getTo().getTicker()))){
                 userLiquidities.add(liquidityTo);
             }
@@ -85,6 +94,7 @@ public class Dex {
 
             double delta = exchangedValue;
             double returnedValue = 0;
+            double exchangePoolNewPrice = 0;
 
             if (request.getFrom().getTicker().equals(exchangePool.getLiquidityOne().getTicker())) {
                 returnedValue = y - k / (x + delta);
@@ -92,13 +102,26 @@ public class Dex {
                 double newY = y - returnedValue;
                 exchangePool.getLiquidityOne().setValue(newX);
                 exchangePool.getLiquidityTwo().setValue(newY);
+                exchangePoolNewPrice = delta/returnedValue;
             } else {
                 returnedValue = x - k / (y + delta);
                 double newX = x - returnedValue;
                 double newY = y + delta;
                 exchangePool.getLiquidityOne().setValue(newX);
                 exchangePool.getLiquidityTwo().setValue(newY);
+                exchangePoolNewPrice = returnedValue/delta;
             }
+
+            PriceChangedEvent e = PriceChangedEvent.builder()
+                    .agencyId(agency.getId())
+                    .tickerFrom(exchangePool.getLiquidityOne().getTicker())
+                    .tickerTo(exchangePool.getLiquidityTwo().getTicker())
+                    .price(exchangePoolNewPrice)
+                    .build();
+            notifySubscribers(e);
+
+            double price = delta/returnedValue;
+
             liquidityFrom.setValue(liquidityFrom.getValue() - delta);
             liquidityTo.setValue(liquidityTo.getValue() + returnedValue);
             wallet.setLiquidityList(userLiquidities);
@@ -106,11 +129,26 @@ public class Dex {
             this.exchangePoolRepository.save(exchangePool);
             this.walletRepository.save(wallet);
 
-            logger.info("after swap balances for wallet " + wallet.getId() +  ":\nfrom: " + liquidityFrom + "\nto:" + liquidityTo);
+            com.mcserby.playground.javademoplayground.dto.Liquidity swapped = com.mcserby.playground.javademoplayground.dto.Liquidity.builder()
+                    .name(liquidityFrom.getName())
+                    .ticker(liquidityFrom.getTicker())
+                    .value(delta)
+                    .build();
 
-            return ExchangeResult.builder().message(
-                    "new wallet balances for exchanged liquidity:\nfrom: " + liquidityFrom + "\nto: " + liquidityTo)
+            com.mcserby.playground.javademoplayground.dto.Liquidity result = com.mcserby.playground.javademoplayground.dto.Liquidity.builder()
+                    .name(liquidityTo.getName())
+                    .ticker(liquidityTo.getTicker())
+                    .value(returnedValue)
+                    .build();
+            String message = "swapped " + swapped + " for " + result + " at a price of " + price;
+            logger.info(message);
+
+            return ExchangeResult.builder()
+                    .message(message)
                     .successful(true)
+                    .swapped(swapped)
+                    .result(result)
+                    .price(price)
                     .build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,7 +156,22 @@ public class Dex {
                     .successful(false)
                     .build();
         }
-
     }
+
+    private void notifySubscribers(PriceChangedEvent e) {
+        this.subscribers.values().forEach(s -> s.onPriceChanged(e));
+    }
+
+    private ExchangePool searchEligibleLP(ExchangeRequest request, Agency agency) {
+        return agency.getExchangePools().stream()
+                .filter(ep -> (ep.getLiquidityOne().getTicker().equals(request.getFrom().getTicker())
+                        && ep.getLiquidityTwo().getTicker().equals(request.getTo().getTicker()))
+                        || (ep.getLiquidityTwo().getTicker().equals(request.getFrom().getTicker())
+                        && ep.getLiquidityOne().getTicker().equals(request.getTo().getTicker()))).findFirst()
+                .orElseThrow(() -> new RuntimeException(
+                        "Liquidity pool not found for this token pair: " + request.getFrom().getTicker() + "/" +
+                                request.getTo().getTicker()));
+    }
+
 
 }

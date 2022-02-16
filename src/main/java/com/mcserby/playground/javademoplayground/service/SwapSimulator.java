@@ -66,7 +66,6 @@ public class SwapSimulator {
     }
 
     private void simulateSwapTask() {
-        logger.info("simulate swap task");
         Random random = new Random();
         Person p = getRandomPerson();
         if (p.getWallets().isEmpty()) {

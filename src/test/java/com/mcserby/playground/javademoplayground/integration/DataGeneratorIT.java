@@ -26,6 +26,7 @@ public class DataGeneratorIT {
     private static final int MAX_WALLETS_PER_PERSON = 3;
     private static final int MAX_EXCHANGE_POOLS = 10;
     private static final double MAX_LIQUIDITY_VALUE = 100_000_000_000.0;
+    private static final double MAX_PERSON_LIQUIDITY_VALUE = 10_000.0;
 
 
     @Autowired
@@ -39,7 +40,7 @@ public class DataGeneratorIT {
         Random random = new Random();
         for (int i = 0; i < NUMBER_OF_RANDOM_PERSONS; i++) {
             Person person =
-                    RandomEntityGenerator.generateRandomPerson(MAX_WALLETS_PER_PERSON, MAX_LIQUIDITY_VALUE, random);
+                    RandomEntityGenerator.generateRandomPerson(MAX_WALLETS_PER_PERSON, MAX_PERSON_LIQUIDITY_VALUE, random);
             logger.info("person: " + person.getName());
             personRepository.save(person);
         }

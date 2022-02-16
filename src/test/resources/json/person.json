@@ -1,0 +1,27 @@
+{
+  "name": "Serby",
+  "address": "Cluj Napoca",
+  "photo": "YXNsamZkYXNvaWRmamFzb2pmYXNsZGZqYXNkZmpwYXNvamZkYXNsamZkb2FzZGpmb2FzamZvYXNkamRmb2FzZGZhcyA",
+  "wallets": [
+    {
+      "name": "crypto-wallet",
+      "liquidityList": [
+        {
+          "value": 100,
+          "name": "Dollar",
+          "ticker": "USD"
+        },
+        {
+          "value": 1000,
+          "name": "Euro",
+          "ticker": "EUR"
+        },
+        {
+          "value": 500,
+          "name": "eGold",
+          "ticker": "EGLD"
+        }
+      ]
+    }
+  ]
+}
