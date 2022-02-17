@@ -93,6 +93,7 @@ public class SwapSimulator {
                 .personId(p.getId())
                 .walletId(w.getId())
                 .agencyId(a.getId())
+                .value(exchangedLiquidity.getValue())
                 .from(exchangedLiquidity.getTicker())
                 .to(maybeTo.get())
                 .build();

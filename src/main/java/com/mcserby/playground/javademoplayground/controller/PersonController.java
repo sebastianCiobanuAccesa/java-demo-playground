@@ -3,8 +3,10 @@ package com.mcserby.playground.javademoplayground.controller;
 import com.mcserby.playground.javademoplayground.dto.Person;
 import com.mcserby.playground.javademoplayground.mapper.DtoToEntityMapper;
 import com.mcserby.playground.javademoplayground.monitoring.TrackExecutionTime;
+import com.mcserby.playground.javademoplayground.persistence.model.Wallet;
 import com.mcserby.playground.javademoplayground.persistence.repository.PersonRepository;
 import com.mcserby.playground.javademoplayground.persistence.repository.WalletRepository;
+import com.mcserby.playground.javademoplayground.service.PriceOracle;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +20,15 @@ public class PersonController {
 
     private final PersonRepository repository;
     private final WalletRepository walletRepository;
+    private final PriceOracle priceOracle;
 
     public PersonController(
             PersonRepository repository,
-            WalletRepository walletRepository) {
+            WalletRepository walletRepository,
+            PriceOracle priceOracle) {
         this.repository = repository;
         this.walletRepository = walletRepository;
+        this.priceOracle = priceOracle;
     }
 
     @GetMapping("/persons")
@@ -54,6 +59,14 @@ public class PersonController {
     @CachePut("person")
     Person replace(@RequestBody Person person) {
         return DtoToEntityMapper.map(repository.save(DtoToEntityMapper.map(person)));
+    }
+
+
+    @GetMapping("/person/wallet-value/{walletId}")
+    @TrackExecutionTime
+    Double getWalletTotalValueIn(@PathVariable Long walletId, @RequestParam String tokenOut){
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new RuntimeException("Wallet not found"));
+        return priceOracle.findValue(wallet, tokenOut);
     }
 
     @DeleteMapping("/person/{id}")
