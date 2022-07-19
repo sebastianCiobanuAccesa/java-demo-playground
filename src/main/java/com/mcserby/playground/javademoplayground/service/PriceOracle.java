@@ -34,7 +34,7 @@ public class PriceOracle implements PriceChangesSubscriber {
     }
 
     public Double getEstimatedPrice(String tickerInQuestion, String referenceTicker) {
-        if(tickerInQuestion.equals(referenceTicker)){
+        if (tickerInQuestion.equals(referenceTicker)) {
             return 1.0;
         }
         return priceRepo.getOrDefault(tickerInQuestion + "_" + referenceTicker,
