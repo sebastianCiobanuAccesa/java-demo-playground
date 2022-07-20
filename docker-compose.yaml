@@ -1,0 +1,8 @@
+version: "3"
+services:
+
+  java-app:
+    container_name: my-java-app1
+    image: "my-new-java-image"
+    ports:
+      - "8084:8080"
