@@ -69,7 +69,7 @@ public class RandomEntityGenerator {
     private static Wallet generateRandomWallet(double maxLiquidityValue, Random random) {
         List<String> keys = new ArrayList<>(CURRENCIES.keySet());
         Collections.shuffle(keys);
-        List<Liquidity> liquidityList = keys.subList(0, random.nextInt(10))
+        List<Liquidity> liquidityList = keys.subList(0, random.nextInt(keys.size())) // CHANGE
                 .stream()
                 .map(k -> Liquidity.builder()
                         .value(random.nextDouble() * maxLiquidityValue)

@@ -48,9 +48,9 @@ class SwapSimulatorTestIT {
         agencyRepository.save(agency2);
 
         swapSimulator.startSwap(1000);
-        Thread.sleep(120_000);
+//        Thread.sleep(120_000);
         swapSimulator.stopSwap();
-        Thread.sleep(5_000);
+//        Thread.sleep(5_000);
     }
 
     private void generatePersons(int number) {

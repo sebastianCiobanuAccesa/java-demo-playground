@@ -89,7 +89,7 @@ public class PersistenceLayerIT {
 
         assertEquals(2, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, "exchange_pool"));
         assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, "agency"));
-        assertEquals(1, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, "wallet"));
+        assertEquals(0, JdbcTestUtils.countRowsInTable(this.jdbcTemplate, "wallet")); // CHANGE
 
         System.out.println(this.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString((DtoToEntityMapper.map(saved))));
 

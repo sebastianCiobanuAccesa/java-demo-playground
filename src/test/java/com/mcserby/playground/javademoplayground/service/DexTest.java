@@ -155,7 +155,12 @@ class DexTest {
         when(personRepository.findById(1L)).thenReturn(Optional.of(Person.builder().build()));
         when(walletRepository.findById(1L)).thenReturn(Optional.of(wallet));
 
+        System.out.println("Graph: "+agency.getGraph());
+
         ExchangeResult swap1 = dex.swap(request);
+
+        System.out.println("Graph: "+agency.getGraph());
+
         ExchangeResult swap2 = dex.swap(request);
         ExchangeResult swap3 = dex.swap(request);
         ExchangeResult swap4 = dex.swap(request);

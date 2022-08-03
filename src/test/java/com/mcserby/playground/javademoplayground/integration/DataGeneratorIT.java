@@ -20,7 +20,7 @@ public class DataGeneratorIT {
 
     private final Logger logger = LoggerFactory.getLogger(DataGeneratorIT.class);
 
-    private static final int NUMBER_OF_RANDOM_PERSONS = 100_000;
+    private static final int NUMBER_OF_RANDOM_PERSONS = 100; // CHANGED
     private static final int NUMBER_OF_RANDOM_AGENCIES = 1;
     private static final int MAX_WALLETS_PER_AGENCY = 1;
     private static final int MAX_WALLETS_PER_PERSON = 3;
@@ -47,7 +47,8 @@ public class DataGeneratorIT {
     }
 
     @Test
-    void generateRandomAgencies(Random random) {
+    void generateRandomAgencies() {
+        Random random = new Random(); // CHANGED
         for (int i = 0; i < NUMBER_OF_RANDOM_AGENCIES; i++) {
             Agency agency = RandomEntityGenerator
                     .generateRandomAgency(MAX_EXCHANGE_POOLS, MAX_LIQUIDITY_VALUE, random);

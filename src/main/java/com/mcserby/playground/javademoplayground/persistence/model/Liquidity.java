@@ -7,13 +7,14 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.io.Serializable;
 
 @Data
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Liquidity {
+public class Liquidity implements Serializable{
 
     @Column
     private Double value;
